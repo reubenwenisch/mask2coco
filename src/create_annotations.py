@@ -82,6 +82,7 @@ def create_image_annotation(file_name, width, height, image_id):
     return images
 
 def create_annotation_format(polygon, segmentation, image_id, category_id, annotation_id):
+    print("multi_poly.bounds inside", polygon.bounds)
     min_x, min_y, max_x, max_y = polygon.bounds
     width = max_x - min_x
     height = max_y - min_y
