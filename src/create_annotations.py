@@ -52,8 +52,10 @@ def create_sub_mask_annotation(sub_mask):
             continue
 
         polygons.append(poly)
-
-        segmentation = np.array(poly.exterior.coords).ravel().tolist()
+        if poly.geometry.type == 'Polygon':
+            segmentation = np.array(poly.exterior.coords).ravel().tolist()
+        elif poly.geometry.type == 'MultiPolygon':
+            segmentation = [list(x.exterior.coords) for x in poly.geoms]
         segmentations.append(segmentation)
     
     return polygons, segmentations
