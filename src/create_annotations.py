@@ -52,12 +52,13 @@ def create_sub_mask_annotation(sub_mask):
             continue
 
         polygons.append(poly)
-        if poly.geometry.type == 'Polygon':
+        if poly.geom_type == 'Polygon':
             segmentation = np.array(poly.exterior.coords).ravel().tolist()
-        elif poly.geometry.type == 'MultiPolygon':
-            segmentation = [list(x.exterior.coords) for x in poly.geoms]
-        segmentations.append(segmentation)
-    
+            segmentations.append(segmentation)
+        elif poly.geom_type == 'MultiPolygon':
+            for x in poly.geoms:
+                segmentation = list(x.exterior.coords)
+                segmentations.append(segmentation)
     return polygons, segmentations
 
 def create_category_annotation(category_dict):
@@ -75,7 +76,7 @@ def create_category_annotation(category_dict):
 
 def create_image_annotation(file_name, width, height, image_id):
     images = {
-        "file_name": file_name,
+        "file_name": file_name + '.jpg',
         "height": height,
         "width": width,
         "id": image_id
@@ -88,7 +89,8 @@ def create_annotation_format(polygon, segmentation, image_id, category_id, annot
     min_x, min_y, max_x, max_y = polygon.bounds
     width = max_x - min_x
     height = max_y - min_y
-    bbox = (min_x, min_y, width, height)
+    bbox = (int(min_x), int(min_y), int(width), int(height))
+    bbox = np.clip(bbox, 0, np.inf).astype(int).tolist()
     area = polygon.area
 
     annotation = {
